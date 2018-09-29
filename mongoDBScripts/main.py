@@ -13,7 +13,7 @@ import sys
 import argparse
 import os
 import platform
-import json
+import time
 
 #CONSTANTS
 DropDatabase=False
@@ -48,23 +48,30 @@ def printOptions():
     print 'Introduce "add" para introducir un nuevo elemento en alguna coleccion'
     print 'Introduce "info" para obtener la informacion de la BD'
     print 'Introduce "more" para obtener la lista completa de comandos'
-    if more:
-        print 'hola'
+    print 'Introduce "dropbd" para eliminar una base de datos'
+    print 'Introduce "dropcol" para eliminar una coleccion'
+    print '----------------------------------------------------------\nCONSOLA:\n'
 
 def refreshScreen():
     if platform.system=='Windows':
         os.system('cls')
     else:
         os.system('clear')
+    printLogo()
+    printOptions()
 
 def gestionateAddDB():
-    print 'entro'
-    raw_input('Introduce una opcion')
+    refreshScreen()
+    print 'TODAVIA NO IMPLEMENTADO'
+    raw_input('Intro para regresar ')
 
 def gestionateAdd():
-    print 'AHORA SI'
+    refreshScreen()
+    print 'TODAVIA NO IMPLEMENTADO'
+    raw_input('Intro para regresar ')
 
 def gestionateInfo():
+    refreshScreen()
     c = pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
     databases=c.database_names
     d = dict((db, [collection for collection in c[db].collection_names()])
@@ -82,9 +89,33 @@ def gestionateQuit():
 
 def gestionateMore():
     more=True
-def gestionateDrop():
-    print 'drop'
+def gestionateDropBD():
+    refreshScreen()
+    client = pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
+    dbname=raw_input('Introduce el nombre de la base de datos que quieres borrar: ')
+    if not dbname in client.database_names():
+        print "La base de datos seleccionada no existe, usa el comando 'info' para ver las bases de datos disponibles"
+    client.drop_database(dbname[:-1])
+    raw_input('Completado, pulsa intro para regresar ')
 
+def gestionateDropCOL():
+    refreshScreen()
+    client = pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
+    dbname=raw_input('Introduce el nombre de la base de la de datos de la que quieres borrar una coleccion: ')
+    colname=raw_input('Introduce el nombre de la coleccion que quieres borrar: ')
+
+    if not dbname in client.database_names():
+        print "La coleccion seleccionada no existe, usa el comando 'info' para ver las bases de datos disponibles"
+    if not colname in client[dbname].collection_names():
+        print "La coleccion seleccionada no existe, usa el comando 'info' para ver las bases de datos disponibles"
+    raw_input('Completado, pulsa intro para regresar ')
+    client[dbname].drop_collection(colname)
+
+
+def error():
+    print 'La opcion introducida es incorrecta'
+    time.sleep(0.5)
+    
 
 def gestionateInteraction(option):
     #This dictionary uses a switch for choose the option to execute
@@ -94,9 +125,12 @@ def gestionateInteraction(option):
         'info':gestionateInfo,
         'quit': gestionateQuit,
         'more':gestionateMore,
-        'drop' : gestionateDrop 
+        'dropbd' : gestionateDropBD,
+        'dropcol' : gestionateDropCOL
     }
-    return optionsDict[option]()
+    #Need to default a default function that will manage an incorrect output
+    return optionsDict.get(option.lower(),error)()
+
 def main():
     more=False
     printLogo()
@@ -136,14 +170,11 @@ def main():
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
     refreshScreen()
-    printLogo()
     option=''
     while option !='quit':
-        printOptions()
         option=raw_input('\n')
         gestionateInteraction(option) 
         refreshScreen()
-        printLogo()
     print 'SESION CERRADA'
 
 
