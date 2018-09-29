@@ -11,6 +11,8 @@ import pymongo
 from bson.objectid import ObjectId
 import sys
 import argparse
+import os
+import platform
 
 #CONSTANTS
 DropDatabase=False
@@ -24,14 +26,29 @@ parser=argparse.ArgumentParser(
     epilog="""TODAVIA EN CONSTRUCCION""")
 parser.add_argument('--drop',nargs=1,help='Si se introduce esta opcion se vaciara el contenido de la base de datos antes de introducir el nuevo contenido')
 parser.add_argument('--db',nargs=2,help='Indicar un nombre concreto para la base de datos y no el del archivo de configuracion')
-def main():
+
+def printLogo():
     print "\n"
+    print "     xxxxxxxxxxxxxxxxxxxxxxx     " 
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     print "   ___     ___     ___     ___  " 
     print " /  __|   /   \   | _ )   |   \  "
     print " | (_ |   | - |   | _ \   | |) | "
     print "  \___|   |_|_|   |___/   |___/  "
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     print "     xxxxxxxxxxxxxxxxxxxxxxx     \n\n" 
+
+def printOptions():
+    print 'Introduce "quit" para cerrar la sesion'
+
+def refreshScreen():
+    if platform.system=='Windows':
+        os.system('cls')
+    else:
+        os.system('clear')
+
+def main():
+    printLogo()
    
     print 'Parametros: '
     if len(sys.argv)==0:
@@ -67,6 +84,16 @@ def main():
     mycol.delete_one({'TEST': 'TEST'})
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
+    refreshScreen()
+    printLogo()
+    option=''
+    while option !='quit':
+        printOptions()
+        option=raw_input('\n') 
+        refreshScreen()
+        printLogo()
+    print 'SESION CERRADA'
+
 
 
 if __name__=="__main__":
