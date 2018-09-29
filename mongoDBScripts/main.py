@@ -13,12 +13,16 @@ import sys
 import argparse
 import os
 import platform
+import json
 
 #CONSTANTS
 DropDatabase=False
 DropDatabaseConstant='--drop'
 DatabaseNameConstant='--db'
 DatabaseName=configFile.DATABASE_NAME
+
+#TEMPORAL BUFFER FOR MORE INFORMATION
+more=False
 
 #Argparse help
 parser=argparse.ArgumentParser(
@@ -40,6 +44,12 @@ def printLogo():
 
 def printOptions():
     print 'Introduce "quit" para cerrar la sesion'
+    print 'Introduce "addDB" para introducir una base de de datos'
+    print 'Introduce "add" para introducir un nuevo elemento en alguna coleccion'
+    print 'Introduce "info" para obtener la informacion de la BD'
+    print 'Introduce "more" para obtener la lista completa de comandos'
+    if more:
+        print 'hola'
 
 def refreshScreen():
     if platform.system=='Windows':
@@ -47,7 +57,48 @@ def refreshScreen():
     else:
         os.system('clear')
 
+def gestionateAddDB():
+    print 'entro'
+    raw_input('Introduce una opcion')
+
+def gestionateAdd():
+    print 'AHORA SI'
+
+def gestionateInfo():
+    c = pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
+    databases=c.database_names
+    d = dict((db, [collection for collection in c[db].collection_names()])
+             for db in c.database_names())
+    for index,key in enumerate(d):
+        print 'Base de datos',index,':',key
+        print 'Lista de colecciones de',key
+        for eachCollection in d[key]:
+            print eachCollection
+        print '\n\n'
+    raw_input('Intro para regresar ')
+
+def gestionateQuit():
+    return 0
+
+def gestionateMore():
+    more=True
+def gestionateDrop():
+    print 'drop'
+
+
+def gestionateInteraction(option):
+    #This dictionary uses a switch for choose the option to execute
+    optionsDict={
+        'addDB': gestionateAddDB,
+        'add': gestionateAdd,
+        'info':gestionateInfo,
+        'quit': gestionateQuit,
+        'more':gestionateMore,
+        'drop' : gestionateDrop 
+    }
+    return optionsDict[option]()
 def main():
+    more=False
     printLogo()
    
     print 'Parametros: '
@@ -89,7 +140,8 @@ def main():
     option=''
     while option !='quit':
         printOptions()
-        option=raw_input('\n') 
+        option=raw_input('\n')
+        gestionateInteraction(option) 
         refreshScreen()
         printLogo()
     print 'SESION CERRADA'
