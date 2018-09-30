@@ -6,14 +6,14 @@ import configFile
 import pymongo
 import platform
 import time
+import os
 
 class ClientConsole(object):
     def __init__(self):
         self.client=pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
         self.option=''
         self.optionsDict={
-            'adddb': self.gestionateAddDB,
-            'addcol': self.gestionateAdd,
+            'addcol': self.gestionateAddCol,
             'info':self.gestionateInfo,
             'quit': self.gestionateQuit,
             'dropdb' : self.gestionateDropBD,
@@ -33,7 +33,6 @@ class ClientConsole(object):
 
     def printOptions(self):
         print 'Introduce "quit" para cerrar la sesion'
-        print 'Introduce "adddb" para introducir una base de de datos'
         print 'Introduce "addcol" para introducir un nuevo elemento en alguna coleccion'
         print 'Introduce "info" para obtener la informacion de la BD'
         print 'Introduce "more" para obtener la lista completa de comandos'
@@ -52,15 +51,42 @@ class ClientConsole(object):
         self.printLogo()
         self.printOptions()
 
-    def gestionateAddDB(self):
+    def gestionateAddCol(self):
         self.refreshScreen()
-        print 'TODAVIA NO IMPLEMENTADO'
-        raw_input('Intro para regresar ')
 
-    def gestionateAdd(self):
-        self.refreshScreen( )
-        print 'TODAVIA NO IMPLEMENTADO'
-        raw_input('Intro para regresar ')
+        db=raw_input('Introduce el nombre de la base de datos donde quieras crear la coleccion: ')
+        col=raw_input('Introduce el nombre de la nueva coleccion: ')
+        mydb=self.client[db]
+        mycol=mydb[col]
+        enteredOption='moi'
+
+        mycolFieldsValues={}
+        mycolFieldsContent={}
+
+        acceptedTypes=['ObjectId','double','string','object','array',
+                        'binData','undefined','bool','date','null','regex',
+                        'dbPointer','javascript','symbol','javascriptWithScope',
+                        'int','timestamp','long','decimal','minType','maxType']
+        acceptedTypesExample =[
+            '11111',0,'','null',[],0,'undefined',0,'ISODate("2014-01-01T08:15:39.736Z")','null',
+            '*','','','','',0,'Timestamp(1412180887, 1)',0,0,-1,127 
+        ]
+
+        print 'Tipos de datos aceptados: ',', '.join(acceptedTypes)
+        while enteredOption != '':
+            enteredOption=raw_input('Introduce el nombre de un campo: ')
+            typeOption=raw_input('Introduce un nuevo tipo: ')
+            if typeOption in acceptedTypes or not enteredOption:
+                mycolFieldsValues[enteredOption]=typeOption
+            else:
+                print 'Error en el tipo de datos vuelve a intentarlo'
+        del mycolFieldsValues['']
+        mydict={}
+        
+        for i in mycolFieldsValues:
+            mydict[i]=acceptedTypesExample[acceptedTypes.index(mycolFieldsValues[i])]
+        x = mycol.insert_one(mydict)
+        raw_input('Completado,intro para regresar ')
 
     def gestionateInfo(self):
         self.refreshScreen()
@@ -111,7 +137,7 @@ class ClientConsole(object):
 
     def start(self):
         self.refreshScreen()    
-        while self.option !='quit':
+        while self.option.lower() !='quit':
             self.option=raw_input('\n')
             self.gestionateInteraction() 
             self.refreshScreen()
