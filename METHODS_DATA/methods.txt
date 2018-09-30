@@ -1,0 +1,3 @@
+CMOD,Consensus Regularized Multi-view Outlier Detection,3,['a','b','g']
+DMOD,Dual-Regularized Multi-view Outlier Detection,3,['a','b','g']
+HOAD,Horizontal Anomaly Detection,1,['k']
