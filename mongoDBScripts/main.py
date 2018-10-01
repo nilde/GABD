@@ -5,7 +5,8 @@ import sys
 
 import configFile 
 import ExtractDataNames
-import ExtractDataData
+from ExtractDataData import extractData
+from ExtractDataMethods import ExtractMethods
 import ExtractDataMethods
 import MakeDatabase
 import MakeInsertionsToDatabaseNames
@@ -36,7 +37,9 @@ parser.add_argument('--drop',nargs=1,help='Si se introduce esta opcion se vaciar
 parser.add_argument('--db',nargs=2,help='Indicar un nombre concreto para la base de datos y no el del archivo de configuracion')
 
 def main():
-    more=False
+    clientConsole=ClientConsole()
+    dataExtractor=extractData()
+    methodExtractor=ExtractMethods()
    
     print 'Parametros: '
     if len(sys.argv)==0:
@@ -55,6 +58,8 @@ def main():
     if not serverStatus:
         return -1
 
+
+    methodExtractor.extractAllMethodInformation()
     print "FASE 2: Extraccion de las fases: "   
     allSections,allData=ExtractDataNames.main()
     MakeInsertionsToDatabaseNames.insertSections(allSections,DatabaseName)
@@ -62,7 +67,9 @@ def main():
     mydb = client[configFile.DATABASE_NAME]
     mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
     print "FASE 3: Extraccion de los datos: "
-    allData,allClasses=ExtractDataData.main()
+    allClasses,allData=dataExtractor.makeExtraction()
+    print allData
+    time.sleep(0.5)
     print "FASE 4: Insercion de los datos: "
     MakeInsertionsToDatabaseData.insertData(allData,allClasses,DatabaseName)
 
@@ -72,7 +79,7 @@ def main():
     mycol.delete_one({'TEST': 'TEST'})
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
-    clientConsole=ClientConsole()
+    
     clientConsole.start()
 
 if __name__=="__main__":

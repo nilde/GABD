@@ -7,50 +7,35 @@ import configFile
 import re
 
 import string
+class ExtractMethods:
+    def __init__(self):
+        self.content=[]
 
-def openFileNames(path,filename):
-    with open(path+filename) as f:
-        content = f.readlines()
-    print content
-    return content
+        #Contain the methods definition column values
+        self.allMethodsDescriptions=[]
 
-def generateSeparatedContent(allContent,contentSections):
-    initialIndex=0
-    lastIndex=0
-    allSeparatedSections=[]
-    eachSectionContent=[]
+        #Contain the all different methods information
+        self.allMethodsValues=[]
 
-    #Iteration over all content file knowing when a section is finish and saving it apart
-    for eachSectionTitle in contentSections[1:]:
-        lastIndex=allContent.index(eachSectionTitle)
-        eachSectionContent=allContent[initialIndex:lastIndex]
-        allSeparatedSections.append(eachSectionContent)
-        eachSectionContent=[]
-        initialIndex=lastIndex-1
+    def getAllMehodsDescriptions(self):
+        return self.allMethodsDescriptions
+    
+    def getAllMehodsValues(self):
+        return self.allMethodsValues
 
-    #Append the last section of the document
-    allSeparatedSections.append(allContent[lastIndex:-1])
-    return allSeparatedSections
+    def extractAllMethodInformation(self):
+        with open(configFile.METHOD_PATH+configFile.METHOD_FILENAME_NAMES) as f:
+            self.allMethodsDescriptions = f.readlines()
+            self.allMethodsDescriptions=[x.translate(string.maketrans("", "", ), '\n\r') for x in self.allMethodsDescriptions ]
+        with open(configFile.METHOD_PATH+configFile.METHOD_FILENAME_DATA) as f:
+            self.allMethodsValues = f.readlines()
+            self.allMethodsValues=[x.translate(string.maketrans("", "", ), '\n\r') for x in self.allMethodsValues ]
 
+        self.allMethodsDescriptions=[i.split(',') for i in self.allMethodsDescriptions ][0]
+        self.allMethodsValues= [i.split(',') for i in self.allMethodsValues]
 
-def extractAllDataInformation():
-    allDataInformation=[]
-    allClasses=[]
-    for eachFilename in configFile.VECTOR_FILENAMES_DATA:
-        with open(configFile.VECTOR_PATH+eachFilename) as f:
-            content = f.readlines()
-        content=[x.translate(string.maketrans("", "", ), '\n\r') for x in content ]
-        allDataInformation.append(content)
-        allClasses.append(eachFilename.split('.')[0])
-    return allClasses,allDataInformation
-
-def main():
-    print " Extraccion de datos en proceso"
-    allClasses,allData=extractAllDataInformation()
-
-    print ' Extraccion de datos completada'
-    print '//////////////////////////////////////////////////////////\n'
-    return allData,allClasses
-
-if __name__=="__main__":
-    main()
+    def makeExtraction(self):
+        print " Extraccion de los metodos en proceso"
+        self.extractAllMethodInformation()
+        print ' Extraccion de los metodos completada'
+        print '//////////////////////////////////////////////////////////\n'

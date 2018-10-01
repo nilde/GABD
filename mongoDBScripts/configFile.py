@@ -15,9 +15,9 @@ VECTOR_FILENAMES_DATA=['breast-cancer-wisconsin.data.txt','ionosphere.data.txt',
                         
 VECTOR_FILENAMES_NAMES=['breast-cancer-wisconsin.names.txt','ionosphere.names.txt','letter-recognition.names']
 
-METHOD_PATH='../METHODS_DATA/'
-METHOD_FILENAME_NAMES='methods.names.txt'
-METHOD_FILENAME_DATA='methods.txt'
+METHOD_PATH="../METHODS_DATA/"
+METHOD_FILENAME_NAMES="methods.name.txt"
+METHOD_FILENAME_DATA="methods.txt"
 
 #DATA_INSERTION_CONFIGURATION
 INSERT_DATA=True
