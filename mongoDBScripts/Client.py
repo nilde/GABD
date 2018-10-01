@@ -10,7 +10,7 @@ import os
 
 class ClientConsole(object):
     def __init__(self):
-        self.client=pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
+        self.client=object()
         self.option=''
         self.optionsDict={
             'addcol': self.gestionateAddCol,
@@ -119,7 +119,7 @@ class ClientConsole(object):
         colname=raw_input('Introduce el nombre de la coleccion que quieres borrar: ')
 
         if not dbname in self.client.database_names():
-            print "La coleccion seleccionada no existe, usa el comando 'info' para ver las bases de datos disponibles"
+            print "La base de datos seleccionada no existe, usa el comando 'info' para ver las bases de datos disponibles"
         if not colname in self.client[dbname].collection_names():
             print "La coleccion seleccionada no existe, usa el comando 'info' para ver las bases de datos disponibles"
         raw_input('Completado, pulsa intro para regresar ')
@@ -135,7 +135,8 @@ class ClientConsole(object):
         #Need to default a default function that will manage an incorrect output
         return self.optionsDict.get(self.option.lower(),self.error)()
 
-    def start(self):
+    def start(self,client):
+        self.client=client
         self.refreshScreen()    
         while self.option.lower() !='quit':
             self.option=raw_input('\n')

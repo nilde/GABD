@@ -54,7 +54,7 @@ def main():
         print '--db : Has introducido un nombre para la base de datos diferente\n'
 
     print "FASE 1: Configuracion de la base de datos: " 
-    serverStatus=MakeDatabase.createDatabase(DropDatabase,DatabaseName)
+    serverStatus,client=MakeDatabase.createDatabase(DropDatabase,DatabaseName)
     if not serverStatus:
         return -1
 
@@ -62,8 +62,7 @@ def main():
     methodExtractor.extractAllMethodInformation()
     print "FASE 2: Extraccion de las fases: "   
     allSections,allData=ExtractDataNames.main()
-    MakeInsertionsToDatabaseNames.insertSections(allSections,DatabaseName)
-    client = pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
+    MakeInsertionsToDatabaseNames.insertSections(allSections,DatabaseName,client)
     mydb = client[configFile.DATABASE_NAME]
     mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
     print "FASE 3: Extraccion de los datos: "
@@ -80,7 +79,7 @@ def main():
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
     
-    clientConsole.start()
+    clientConsole.start(client)
 
 if __name__=="__main__":
     main()

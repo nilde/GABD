@@ -9,7 +9,7 @@ def createDatabase(DropDatabase,DatabaseName):
     
     try:
         client = pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT,
-            serverSelectionTimeoutMS=10)
+            serverSelectionTimeoutMS=1000)
         if DropDatabase:
             client.drop_database(DatabaseName)
         mydb = client[DatabaseName]
@@ -20,10 +20,10 @@ def createDatabase(DropDatabase,DatabaseName):
             x = mycol.insert_one(mydict)
         print ' Creacion de la base de datos realizada'
         print '//////////////////////////////////////////////////////////\n'
-        return 1
+        return 1,client
     except Exception as e:
         print(" MONGODB NO ESTA ENCENDIDO")
-        return 0
+        return 0,''
     
 
     
