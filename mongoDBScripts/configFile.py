@@ -18,6 +18,7 @@ VECTOR_FILENAMES_NAMES=['breast-cancer-wisconsin.names.txt','ionosphere.names.tx
 METHOD_PATH="../METHODS_DATA/"
 METHOD_FILENAME_NAMES="methods.name.txt"
 METHOD_FILENAME_DATA="methods.txt"
+METHOD_DATABASE="METHODS"
 
 #DATA_INSERTION_CONFIGURATION
 INSERT_DATA=True

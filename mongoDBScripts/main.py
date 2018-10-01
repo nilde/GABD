@@ -11,6 +11,7 @@ import ExtractDataMethods
 import MakeDatabase
 import MakeInsertionsToDatabaseNames
 import MakeInsertionsToDatabaseData
+from MakeInsertionsToDatabaseMethods import InsertionMethodDatabase
 from Client import ClientConsole
 import pymongo
 from bson.objectid import ObjectId
@@ -40,6 +41,7 @@ def main():
     clientConsole=ClientConsole()
     dataExtractor=extractData()
     methodExtractor=ExtractMethods()
+    methodInsertion=InsertionMethodDatabase()
    
     print 'Parametros: '
     if len(sys.argv)==0:
@@ -59,18 +61,21 @@ def main():
         return -1
 
 
-    methodExtractor.extractAllMethodInformation()
+    
     print "FASE 2: Extraccion de las fases: "   
+    methodExtractor.extractAllMethodInformation()
     allSections,allData=ExtractDataNames.main()
     MakeInsertionsToDatabaseNames.insertSections(allSections,DatabaseName,client)
     mydb = client[configFile.DATABASE_NAME]
     mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
     print "FASE 3: Extraccion de los datos: "
     allClasses,allData=dataExtractor.makeExtraction()
-    print allData
-    time.sleep(0.5)
     print "FASE 4: Insercion de los datos: "
     MakeInsertionsToDatabaseData.insertData(allData,allClasses,DatabaseName)
+    
+    print "FASE 5: Insercion de los metodos"
+    methodsDescription,methodsData=methodExtractor.getAllMethodsInformation()
+    methodInsertion.makeMethodsInsertions(methodsDescription,methodsData,client,DatabaseName)
 
 
     #Delete of the element that mantains open the connection
@@ -80,6 +85,7 @@ def main():
     print 'EJECUCION COMPLETA SIN ERRORES :)'
     
     clientConsole.start(client)
+    client.close()
 
 if __name__=="__main__":
     main()

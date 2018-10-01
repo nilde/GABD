@@ -17,6 +17,8 @@ class ExtractMethods:
         #Contain the all different methods information
         self.allMethodsValues=[]
 
+    def getAllMethodsInformation(self):
+        return self.allMethodsDescriptions,self.allMethodsValues
     def getAllMehodsDescriptions(self):
         return self.allMethodsDescriptions
     
