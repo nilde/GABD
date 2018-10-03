@@ -7,17 +7,19 @@ import configFile
 import ExtractDataNames
 from ExtractDataData import extractData
 from ExtractDataMethods import ExtractMethods
+from ExtractDataResults import ExtractResults
 import ExtractDataMethods
 import MakeDatabase
 import MakeInsertionsToDatabaseNames
 import MakeInsertionsToDatabaseData
+from MakeInsertionsToDatabaseResults import InsertionResultDatabase
 from MakeInsertionsToDatabaseMethods import InsertionMethodDatabase
 from Client import ClientConsole
 import pymongo
 from bson.objectid import ObjectId
 
 import argparse
-import os
+import os 
 import platform
 import time
 
@@ -42,6 +44,8 @@ def main():
     dataExtractor=extractData()
     methodExtractor=ExtractMethods()
     methodInsertion=InsertionMethodDatabase()
+    resultExtractor=ExtractResults()
+    resultsInsertion=InsertionResultDatabase()
    
     print 'Parametros: '
     if len(sys.argv)==0:
@@ -64,19 +68,22 @@ def main():
     
     print "FASE 2: Extraccion de las fases: "   
     methodExtractor.extractAllMethodInformation()
-    allSections,allData=ExtractDataNames.main()
-    MakeInsertionsToDatabaseNames.insertSections(allSections,DatabaseName,client)
     mydb = client[configFile.DATABASE_NAME]
     mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
     print "FASE 3: Extraccion de los datos: "
     allClasses,allData=dataExtractor.makeExtraction()
+    allSections,allDataV=ExtractDataNames.main()
+    MakeInsertionsToDatabaseNames.insertSections(allSections,allClasses,DatabaseName,client,allDataV)
     print "FASE 4: Insercion de los datos: "
-    MakeInsertionsToDatabaseData.insertData(allData,allClasses,DatabaseName)
+    #MakeInsertionsToDatabaseData.insertData(allDataV,allClasses,DatabaseName)
     
     print "FASE 5: Insercion de los metodos"
     methodsDescription,methodsData=methodExtractor.getAllMethodsInformation()
     methodInsertion.makeMethodsInsertions(methodsDescription,methodsData,client,DatabaseName)
-
+    
+    print "FASE 6: Insercion de los resultados"
+    resultsDescription,resultsData=resultExtractor.makeExtraction() 
+    resultsInsertion.makeResultsInsertions(resultsDescription,resultsData,client,DatabaseName)
 
     #Delete of the element that mantains open the connection
 

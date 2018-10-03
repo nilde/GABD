@@ -106,8 +106,6 @@ class ClientConsole(object):
     def gestionateDropBD(self):
         self.refreshScreen()
         dbname=raw_input('Introduce el nombre de la base de datos que quieres borrar: ')
-        print dbname
-        print self.client.database_names()
         if not dbname in self.client.database_names():
             print "La base de datos seleccionada no existe, usa el comando 'info' para ver las bases de datos disponibles"
         self.client.drop_database(dbname)

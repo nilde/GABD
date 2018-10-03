@@ -4,12 +4,26 @@
 import configFile
 import pymongo
 
-def insertSections(allSections,DatabaseName,client):
+def insertSections(allSections,allClasses,DatabaseName,client,dataVectors):
     dataSection={}
-    for eachSection in allSections:
-        for i,section in enumerate(eachSection):
-            dataSection['Section_'+str(i+1)]=section[0]
-    
+    vectorBufferComplete=[]
     mydb = client[DatabaseName]
     mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
-    x = mycol.insert_one(dataSection)
+    for j,eachClass in enumerate(allClasses):
+        dataSection={}
+        dataSection['name']=eachClass
+        for eachSection in allSections:
+            for i,section in enumerate(eachSection):
+                dataSection[configFile.VECTOR_FILENAMES_SECTIONS[i]]=section[0]
+
+        vectorBuffer={}
+        vectorBufferComplete=[]
+        for eachVector in dataVectors[j]:
+            if len(eachVector)>0:
+                vectorBuffer['class']=eachVector[-1]
+                vectorBuffer['vector']=eachVector
+                vectorBufferComplete.append(vectorBuffer)
+                vectorBuffer={}
+        dataSection['content']=vectorBufferComplete
+        mycol.insert_one(dataSection)
+    

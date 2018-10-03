@@ -4,7 +4,7 @@
 import configFile
 import pymongo
 
-class InsertionMethodDatabase:
+class InsertionResultDatabase:
     def __init__(self):
         self.methodsNames=[]
         self.methodsAllValues=[]
@@ -24,20 +24,16 @@ class InsertionMethodDatabase:
         mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
         x = mycol.insert_one(dataSection)
 
-    def makeMethodsInsertions(self,methodsDescription,methodsData,client,DatabaseName):
+    def makeResultsInsertions(self,resultsDescription,resultsData,client,DatabaseName):
         self.client=client
-        methodsComplete={}
-        experiment={'experiments_parameters':{}}
-        experiment['experiments_parameters']={'values':["10,14,13","11,2,3","1,2,3"]}
-        for eachMethodData in methodsData:
-            dataToInsert=eachMethodData[:3]
-            dataToInsert.append(','.join(eachMethodData[3:]))
-            methodsComplete.update(dict(zip(methodsDescription,dataToInsert)))
-            methodsComplete.update(experiment)
+        resultsComplete={}
+        for eachResultData in resultsData:
+            dataToInsert=eachResultData
+            resultsComplete.update(dict(zip(resultsDescription,dataToInsert)))
             mydb = client[DatabaseName]
-            mycol = mydb[configFile.METHOD_DATABASE]
-            x = mycol.insert_one(methodsComplete)
-            methodsComplete={}
+            mycol = mydb[configFile.RESULT_DATABASE]
+            x = mycol.insert_one(resultsComplete)
+            resultsComplete={}
 
             
         
