@@ -63,21 +63,26 @@ def main():
 
 
     
-    print "FASE 2: Extraccion de las fases: "   
-    print "FASE 3: Extraccion de los datos: "
+    print "FASE 2: Extraccion de las fases "
+
+    print "FASE 3: Extraccion de los datos "
     allClasses,allData=dataExtractor.makeExtraction()
     allSections,allDataV=ExtractDataNames.main()
+    
+    print "FASE 4: Insercion de los datos"
     MakeInsertionsToDatabaseNames.insertSections(allSections,allClasses,DatabaseName,client,allDataV)
-    print "FASE 4: Insercion de los datos: "
-    #MakeInsertionsToDatabaseData.insertData(allDataV,allClasses,DatabaseName)
     
     print "FASE 5: Insercion de los metodos"
-    methodsDescription,methodsData=dataExtractor_N.makeExtraction(configFile.METHOD_PATH,configFile.METHOD_FILENAME_NAMES,configFile.METHOD_FILENAME_DATA)
-    methodInsertion.makeMethodsInsertions(methodsDescription,methodsData,client,DatabaseName)
-    
+    description,data=dataExtractor_N.makeExtraction(configFile.METHOD_PATH,configFile.METHOD_FILENAME_NAMES,configFile.METHOD_FILENAME_DATA)
+    methodInsertion.makeMethodsInsertions(description,data,client,DatabaseName)
+    del description[:]
+    del data[:]
+
     print "FASE 6: Insercion de los resultados"
-    resultsDescription,resultsData=dataExtractor_N.makeExtraction(configFile.RESULT_PATH,configFile.RESULT_FILENAME_NAMES,configFile.RESULT_FILENAME_DATA) 
-    resultsInsertion.makeResultsInsertions(resultsDescription,resultsData,client,DatabaseName)
+    description,data=dataExtractor_N.makeExtraction(configFile.RESULT_PATH,configFile.RESULT_FILENAME_NAMES,configFile.RESULT_FILENAME_DATA) 
+    resultsInsertion.makeResultsInsertions(description,data,client,DatabaseName)
+    del description[:]
+    del data[:]
 
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'

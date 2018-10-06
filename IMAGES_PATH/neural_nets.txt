@@ -1,0 +1,3 @@
+AlexNet,ImageNet classification with deep convolutional neural networks,x,x
+VGG,Very Deep Convolutional Networks for Large-Scale Image Recognition,x,x
+ResNet,Deep Residual Learning for Image Recognition,x,x
