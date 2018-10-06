@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#Files
+IMAGES_PATH/IMAGES/*
+IMAGES_PATH/CLASSES/*
