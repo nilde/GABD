@@ -7,38 +7,38 @@ import configFile
 import re
 
 import string
-class ExtractResults:
+class ExtractFromFile:
     def __init__(self):
-        self.content=[]
 
         #Contain the methods definition column values
-        self.allResultsDescriptions=[]
+        self.allDataDescription=[]
 
         #Contain the all different methods information
-        self.allResultsValues=[]
+        self.allDataValues=[]
 
-    def getAllResultsInformation(self):
-        return self.allResultsDescriptions,self.allResultsValues
-    def getAllResultsDescriptions(self):
-        return self.allResultsDescriptions
+    def getAllDataInformation(self):
+        return self.allDataDescription,self.allDataValues
+
+    def getAllDataDescriptions(self):
+        return self.allDataDescription
     
-    def getAllResultsValues(self):
-        return self.allResultsValues
+    def getAllDataValues(self):
+        return self.allDataValues
 
-    def extractAllResultsInformation(self):
-        with open(configFile.RESULT_PATH+configFile.RESULT_FILENAME_NAMES) as f:
-            self.allResultsDescriptions = f.readlines()
-            self.allResultsDescriptions=[x.translate(string.maketrans("", "", ), '\n\r') for x in self.allResultsDescriptions ]
-        with open(configFile.RESULT_PATH+configFile.RESULT_FILENAME_DATA) as f:
-            self.allResultsValues = f.readlines()
-            self.allResultsValues=[x.translate(string.maketrans("", "", ), '\n\r') for x in self.allResultsValues ]
+    def extractAllDataInformation(self,path,filename_names,filename_data):
+        with open(path+filename_names) as f:
+            self.allDataDescription = f.readlines()
+            self.allDataDescription=[x.translate(string.maketrans("", "", ), '\n\r') for x in self.allDataDescription ]
+        with open(path+filename_data) as f:
+            self.allDataValues = f.readlines()
+            self.allDataValues=[x.translate(string.maketrans("", "", ), '\n\r') for x in self.allDataValues ]
 
-        self.allResultsDescriptions=[i.split(',') for i in self.allResultsDescriptions ][0]
-        self.allResultsValues= [i.split(',') for i in self.allResultsValues]
+        self.allDataDescription=[i.split(',') for i in self.allDataDescription ][0]
+        self.allDataValues= [i.split(',') for i in self.allDataValues]
 
-    def makeExtraction(self):
+    def makeExtraction(self,path,filename_names,filename_data):
         print " Extraccion de los metodos en proceso"
-        self.extractAllResultsInformation()
-        return self.getAllResultsInformation()
+        self.extractAllDataInformation(path,filename_names,filename_data)
+        return self.getAllDataInformation()
         print ' Extraccion de los metodos completada'
         print '//////////////////////////////////////////////////////////\n'

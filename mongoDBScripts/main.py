@@ -6,9 +6,7 @@ import sys
 import configFile 
 import ExtractDataNames
 from ExtractDataData import extractData
-from ExtractDataMethods import ExtractMethods
-from ExtractDataResults import ExtractResults
-import ExtractDataMethods
+from ExtractDataResults import ExtractFromFile
 import MakeDatabase
 import MakeInsertionsToDatabaseNames
 import MakeInsertionsToDatabaseData
@@ -42,9 +40,8 @@ parser.add_argument('--db',nargs=2,help='Indicar un nombre concreto para la base
 def main():
     clientConsole=ClientConsole()
     dataExtractor=extractData()
-    methodExtractor=ExtractMethods()
     methodInsertion=InsertionMethodDatabase()
-    resultExtractor=ExtractResults()
+    dataExtractor_N=ExtractFromFile()
     resultsInsertion=InsertionResultDatabase()
    
     print 'Parametros: '
@@ -67,9 +64,6 @@ def main():
 
     
     print "FASE 2: Extraccion de las fases: "   
-    methodExtractor.extractAllMethodInformation()
-    mydb = client[configFile.DATABASE_NAME]
-    mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
     print "FASE 3: Extraccion de los datos: "
     allClasses,allData=dataExtractor.makeExtraction()
     allSections,allDataV=ExtractDataNames.main()
@@ -78,16 +72,13 @@ def main():
     #MakeInsertionsToDatabaseData.insertData(allDataV,allClasses,DatabaseName)
     
     print "FASE 5: Insercion de los metodos"
-    methodsDescription,methodsData=methodExtractor.getAllMethodsInformation()
+    methodsDescription,methodsData=dataExtractor_N.makeExtraction(configFile.METHOD_PATH,configFile.METHOD_FILENAME_NAMES,configFile.METHOD_FILENAME_DATA)
     methodInsertion.makeMethodsInsertions(methodsDescription,methodsData,client,DatabaseName)
     
     print "FASE 6: Insercion de los resultados"
-    resultsDescription,resultsData=resultExtractor.makeExtraction() 
+    resultsDescription,resultsData=dataExtractor_N.makeExtraction(configFile.RESULT_PATH,configFile.RESULT_FILENAME_NAMES,configFile.RESULT_FILENAME_DATA) 
     resultsInsertion.makeResultsInsertions(resultsDescription,resultsData,client,DatabaseName)
 
-    #Delete of the element that mantains open the connection
-
-    mycol.delete_one({'TEST': 'TEST'})
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
     
