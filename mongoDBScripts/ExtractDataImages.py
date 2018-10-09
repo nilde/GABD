@@ -29,26 +29,30 @@ for i,eachClassPath in enumerate(listWithAllClasses):
 #FINISH OF EXTRACTION OF ALL CLASSES INFORMATION
 
 #EXTRACT NUMBER OF LINES OF A VECTOR IMAGE FILE NOT ALL WILL BE HARD TO DEBUG
-head=[]
-print configFile.IMAGES_NUM_LINES
-with open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+"AlexNet1_4000.Labelfeatures") as myfile:
-    head = [next(myfile,'')for x in xrange(configFile.IMAGES_NUM_LINES)]
-# load feature vector
-f = open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+"AlexNet1_4000.Labelfeatures", 'r')
-dims = [int(val) for val in f.readline().rstrip("\n").split(" ")]
-x = f.read()
-f.close()
-size = int(4)  # bytes to represent each float
-totalVectorContent=[]
-for i in range(0, dims[0]):
-    # cur.execute(None, {'image_id': i, 'layer': layer, 'features': Features[i] })
-    bf = x[i * dims[1] * size:(i + 1) * size * dims[1]]
-    numFeatures = len(bf) / size
-    features = list(struct.unpack('24f', bf))
-    totalVectorContent.append( features)
 
-for i,x in enumerate(totalVectorContent):
-    totalVectorContent[i]=[int(j) for j in totalVectorContent[i]]
-print totalVectorContent
+
+
+for eachFile in configFile.IMAGES_V_FILENAMES:
+    dimension=[]
+    with open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+eachFile) as myfile:
+        dimension = [next(myfile,'')for x in xrange(1)]
+
+    dimension=dimension[0][:-1]
+    dimension=dimension.split(' ')
+    print dimension
+    # load feature vector
+
+    f = open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+eachFile, 'r')
+    dims = [int(val) for val in f.readline().rstrip("\n").split(" ")]
+    x = f.read()
+    f.close()
+    size = int(4)  # bytes to represent each float
+    totalVectorContent=[]
+    for i in range(0, dims[0]):
+        bf = x[i * dims[1] * size:(i + 1) * size * dims[1]]
+        numFeatures = len(bf) / size
+        features = list(struct.unpack(dimension[1]+'f', bf))
+        totalVectorContent.append( features)
+    print totalVectorContent[0]
 
 
