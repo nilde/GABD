@@ -1,6 +1,7 @@
 import glob
 import configFile
 import struct
+import numpy as np
 
 
 #Extracts and put in a list all the tags relateed with images
@@ -32,27 +33,24 @@ for i,eachClassPath in enumerate(listWithAllClasses):
 
 
 
-for eachFile in configFile.IMAGES_V_FILENAMES:
-    dimension=[]
-    with open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+eachFile) as myfile:
-        dimension = [next(myfile,'')for x in xrange(1)]
+for eachFileNet in configFile.IMAGES_V_FILENAMES:
+    for eachFileType in configFile.IMAGES_V_TYPES:
+        dimension=[]
 
-    dimension=dimension[0][:-1]
-    dimension=dimension.split(' ')
-    print dimension
-    # load feature vector
+        with open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+eachFileNet+eachFileType) as myfile:
+          dimension = [next(myfile,'')for x in xrange(25000)]
 
-    f = open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+eachFile, 'r')
-    dims = [int(val) for val in f.readline().rstrip("\n").split(" ")]
-    x = f.read()
-    f.close()
-    size = int(4)  # bytes to represent each float
-    totalVectorContent=[]
-    for i in range(0, dims[0]):
-        bf = x[i * dims[1] * size:(i + 1) * size * dims[1]]
-        numFeatures = len(bf) / size
-        features = list(struct.unpack(dimension[1]+'f', bf))
-        totalVectorContent.append( features)
-    print totalVectorContent[0]
+        dimension=dimension[0][:-1]
+        dimension=dimension.split(' ')
+        print dimension
+
+        # load feature vector
+        shape = (int(dimension[0]), int(dimension[1]))
+        with open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+eachFileNet+eachFileType,'rb') as fid:
+            #REVISAR EL FORMATO DE LOS DATOS
+            data = np.fromfile(fid, count=np.prod(shape),dtype = np.uint16)
+        data.shape = shape
+        print data[0].tolist()
+
 
 

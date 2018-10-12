@@ -36,8 +36,9 @@ IMAGES_PATH="../IMAGES_PATH/"
 IMAGES_CLASSES_FOLDER="CLASSES/"
 IMAGES_CONTENT_FOLDER="IMAGES/"
 IMAGES_V_CHARACTERISTICS_FOLDER="VECTORS/"
-IMAGES_V_FILENAMES=['AlexNet1_4000.Labelfeatures','AlexNet1_4000.Sigmoidfeatures','AlexNet1_4000.Visualfeatures',
-'ResNet1_4000.Labelfeatures','ResNet1_4000.Sigmoidfeatures','ResNet1_4000.Visualfeatures','VGG1_4000.Labelfeatures','VGG1_4000.Sigmoidfeatures','VGG1_4000.Visualfeatures']
+IMAGES_V_FILENAMES=['AlexNet1_4000','ResNet1_4000','VGG1_4000']
+IMAGES_V_TYPES=['.Labelfeatures','.Sigmoidfeatures','.Visualfeatures']
+
 IMAGES_NUM_LINES=300
 
 
