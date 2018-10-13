@@ -12,10 +12,8 @@ def insertSections(allSections,allClasses,DatabaseName,client,dataVectors):
     for j,eachClass in enumerate(allClasses):
         dataSection={}
         dataSection['name']=eachClass
-        for eachSection in allSections:
-            for i,section in enumerate(eachSection):
-                dataSection[configFile.VECTOR_FILENAMES_SECTIONS[i]]=section[0]
-
+        for i,eachSection in enumerate(allSections[j]):
+            dataSection[configFile.VECTOR_FILENAMES_SECTIONS[i]]=eachSection[0]
         vectorBuffer={}
         vectorBufferComplete=[]
         for eachVector in dataVectors[j]:
@@ -26,4 +24,4 @@ def insertSections(allSections,allClasses,DatabaseName,client,dataVectors):
                 vectorBuffer={}
         dataSection['content']=vectorBufferComplete
         mycol.insert_one(dataSection)
-    
+

@@ -13,7 +13,7 @@ VECTOR_FILENAMES_DATA=['breast-cancer-wisconsin.data.txt','ionosphere.data.txt',
                         'letter-recognition.txt']
 VECTOR_FILENAMES_SECTIONS=['title','past_uses','source_information','number_of_instances','relevant_information','attribute_information','number_of_attributes','class_distribution','missing_values']
                         
-VECTOR_FILENAMES_NAMES=['breast-cancer-wisconsin.names.txt','ionosphere.names.txt','letter-recognition.names']
+VECTOR_FILENAMES_NAMES=['breast-cancer-wisconsin.names.txt','ionosphere.names.txt','iris.names.txt','letter-recognition.names']
 VECTOR_FILENAMES_SHORT=['breast-cancer-wisconsin','ionosphere','iris',
                         'letter-recognition']
 
