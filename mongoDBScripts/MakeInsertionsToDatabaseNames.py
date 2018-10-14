@@ -3,12 +3,17 @@
 #Contains all data needed to do the task
 import configFile
 import pymongo
+import gridfs
+from bson.binary import Binary
+import pickle
+
 
 def insertSections(allSections,allClasses,DatabaseName,client,dataVectors):
     dataSection={}
     vectorBufferComplete=[]
     mydb = client[DatabaseName]
     mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
+    fs = gridfs.GridFS(mydb)
     for j,eachClass in enumerate(allClasses):
         dataSection={}
         dataSection['name']=eachClass
@@ -22,6 +27,7 @@ def insertSections(allSections,allClasses,DatabaseName,client,dataVectors):
                 vectorBuffer['vector']=eachVector
                 vectorBufferComplete.append(vectorBuffer)
                 vectorBuffer={}
-        dataSection['content']=vectorBufferComplete
+        indexContent = fs.put(Binary(pickle.dumps(vectorBufferComplete, protocol=2)))
+        dataSection['content']=indexContent
         mycol.insert_one(dataSection)
 

@@ -7,11 +7,13 @@ import configFile
 import ExtractDataNames
 from ExtractDataData import extractData
 from ExtractDataResults import ExtractFromFile
+from ExtractDataImages import ExtractFromImagesFiles
 import MakeDatabase
 import MakeInsertionsToDatabaseNames
 import MakeInsertionsToDatabaseData
 from MakeInsertionsToDatabaseResults import InsertionResultDatabase
 from MakeInsertionsToDatabaseMethods import InsertionMethodDatabase
+from MakeInsertionsToDatabaseImages import InsertionImagesDatabase
 from Client import ClientConsole
 import pymongo
 from bson.objectid import ObjectId
@@ -40,8 +42,10 @@ parser.add_argument('--db',nargs=2,help='Indicar un nombre concreto para la base
 def main():
     clientConsole=ClientConsole()
     dataExtractor=extractData()
-    methodInsertion=InsertionMethodDatabase()
     dataExtractor_N=ExtractFromFile()
+    dataExtractor_I=ExtractFromImagesFiles()
+    methodInsertion=InsertionMethodDatabase()
+    imagesInsertion=InsertionImagesDatabase()
     resultsInsertion=InsertionResultDatabase()
    
     print 'Parametros: '
@@ -50,7 +54,7 @@ def main():
 
     if DropDatabaseConstant in sys.argv:
         DropDatabase=True
-        print '--drop : Cuidado, has escogido la opcion drop espero que sepas lo que estas haciendo...'
+        print '--drop : Cuidado, has escogido la opcion drop espero que sepas lo que estas haciendo ...'
 
     if DatabaseNameConstant in sys.argv:
         DatabaseName=sys.argv[-1]
@@ -68,6 +72,9 @@ def main():
     print "FASE 3: Extraccion de los datos "
     allClasses,allData=dataExtractor.makeExtraction()
     allSections,allDataV=ExtractDataNames.main()
+
+    allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages=dataExtractor_I.makeExtraction()
+    imagesInsertion.makeImagesInsertions(allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages,client,DatabaseName)
     
     print "FASE 4: Insercion de los datos"
     MakeInsertionsToDatabaseNames.insertSections(allSections,allClasses,DatabaseName,client,allDataV)
