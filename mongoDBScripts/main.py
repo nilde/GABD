@@ -93,7 +93,7 @@ def main():
 
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
-    
+    client.testdb.add_user('newTestUser', 'Test123', roles=[{'role':'readWrite','db':'testdb'}])
     clientConsole.start(client)
     client.close()
 
