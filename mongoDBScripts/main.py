@@ -11,6 +11,7 @@ from ExtractDataImages import ExtractFromImagesFiles
 import MakeDatabase
 import MakeInsertionsToDatabaseNames
 import MakeInsertionsToDatabaseData
+from MakeInsertionsUsers import InsertionUsers
 from MakeInsertionsToDatabaseResults import InsertionResultDatabase
 from MakeInsertionsToDatabaseMethods import InsertionMethodDatabase
 from MakeInsertionsToDatabaseImages import InsertionImagesDatabase
@@ -47,6 +48,7 @@ def main():
     methodInsertion=InsertionMethodDatabase()
     imagesInsertion=InsertionImagesDatabase()
     resultsInsertion=InsertionResultDatabase()
+    
    
     print 'Parametros: '
     if len(sys.argv)==0:
@@ -74,7 +76,7 @@ def main():
     allSections,allDataV=ExtractDataNames.main()
 
     allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages=dataExtractor_I.makeExtraction()
-    imagesInsertion.makeImagesInsertions(allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages,client,DatabaseName)
+    #imagesInsertion.makeImagesInsertions(allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages,client,DatabaseName)
     
     print "FASE 4: Insercion de los datos"
     MakeInsertionsToDatabaseNames.insertSections(allSections,allClasses,DatabaseName,client,allDataV)
@@ -93,9 +95,11 @@ def main():
 
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
-    client.testdb.add_user('newTestUser', 'Test123', roles=[{'role':'readWrite','db':'testdb'}])
+    usersInsertion=InsertionUsers(client)
     clientConsole.start(client)
     client.close()
+
+    
 
 if __name__=="__main__":
     main()
