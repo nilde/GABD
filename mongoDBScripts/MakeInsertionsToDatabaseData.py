@@ -14,12 +14,13 @@ def insertData(allData,allClasses,DatabaseName):
     client = pymongo.MongoClient(configFile.SERVER_NAME,configFile.PORT)
     mydb = client[DatabaseName]
     mycol = mydb[configFile.COLLECTIONS_NAMES[2]]
+        #Eliminacion del gridfs en favor de un aumento del chunk (Por hacer)
     fs = gridfs.GridFS(mydb)
     for indexSet,setOfVectors in enumerate(allData):
         dataEachVector['database']=allClasses[indexSet]
         dataEachVector['class']=allClasses[indexSet][-1]
-        indexVectors = fs.put(Binary(pickle.dumps(setOfVectors, protocol=2)))
-        dataEachVector['vector']=indexVectors
+        #FUERA
+        dataEachVector['vector']=setOfVectors
             
         mycol.insert_one(dataEachVector)
         dataEachVector={}

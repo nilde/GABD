@@ -17,8 +17,10 @@ class ClientConsole(object):
             'info':self.gestionateInfo,
             'quit': self.gestionateQuit,
             'dropdb' : self.gestionateDropBD,
-            'dropcol' : self.gestionateDropCOL
+            'dropcol' : self.gestionateDropCOL,
+            'testUser':self.testUser
         }
+
 
     def printLogo(self):
         print "\n"
@@ -40,6 +42,9 @@ class ClientConsole(object):
         print 'Introduce "dropcol" para eliminar una coleccion'
         print 'y 0 mas (introduce "more" para ver todos los comandos)'
         print '----------------------------------------------------------\nCONSOLA:\n'
+
+
+    
 
     def refreshScreen(self):
 
@@ -102,6 +107,9 @@ class ClientConsole(object):
 
     def gestionateQuit(self):
         return 0
+
+    def testUser(self):
+        print "No implementado aun"
 
     def gestionateDropBD(self):
         self.refreshScreen()

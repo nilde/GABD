@@ -46,9 +46,9 @@ class ExtractFromImagesFiles:
                 shape = (int(dimension[0]), int(dimension[1]))
                 with open(configFile.IMAGES_PATH+configFile.IMAGES_V_CHARACTERISTICS_FOLDER+eachFileNet+eachFileType,'rb') as fid:
                     #REVISAR EL FORMATO DE LOS DATOS
-                    data = np.fromfile(fid, count=np.prod(shape),dtype = np.uint16)
+                    data = np.fromfile(fid, count=np.prod(shape),dtype = np.float32)
                 data.shape = shape
-                self.rawVectorsInformation.append(data)
+                self.rawVectorsInformation.append(data.tolist())
         
 
 
@@ -58,14 +58,20 @@ class ExtractFromImagesFiles:
 
         for index in range(0,9,3):
             netContent=[]
-            for length in range(len(self.rawVectorsInformation[index][:])):
-                netContent.append([self.rawVectorsInformation[index][length][:],self.rawVectorsInformation[index+1][length][:],self.rawVectorsInformation[index+2][length][:]])
+            with open('prueba'+str(index), "w") as outfile:
+                for entries in finalData:
+                    for length in range(len(self.rawVectorsInformation[index][:])):
+                        outfile.write([self.rawVectorsInformation[index][length][:],self.rawVectorsInformation[index+1][length][:],self.rawVectorsInformation[index+2][length][:]])
+                        outfile.write("\n")
+                netContent.append('')
             finalData.append(netContent)
 
         for eachNet in finalData:
             netsWithImageID={}
-            for i,eachVectors in enumerate(eachNet):
-                netsWithImageID[str(i)]=[x for x in eachVectors]
+            print "llego"
+            
+            #for i,eachVectors in enumerate(eachNet):
+            #    netsWithImageID[str(i)]=[x for x in eachVectors] #N3
             self.vectorsInformationCorretly.append(netsWithImageID)
     def makeExtraction(self):
         self.extractNetsInformation()

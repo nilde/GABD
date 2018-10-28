@@ -13,6 +13,7 @@ def insertSections(allSections,allClasses,DatabaseName,client,dataVectors):
     vectorBufferComplete=[]
     mydb = client[DatabaseName]
     mycol = mydb[configFile.COLLECTIONS_NAMES[0]]
+    #Eliminacion del gridfs en favor de un aumento del chunk (Por hacer)
     fs = gridfs.GridFS(mydb)
     for j,eachClass in enumerate(allClasses):
         dataSection={}
