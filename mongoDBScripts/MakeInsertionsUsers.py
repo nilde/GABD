@@ -13,10 +13,6 @@ class InsertionUsers:
         #use VECT
         #db.grantRolesToUser("auditors", ["hostManager"])
         # db.updateUser("auditor",{ roles: [{role: "hostManager",db:"VECT"}]} )
-
-        #Revisar los permisos que se le dan (quizas un rol personalizado arregle este error)
-        print client.VECT.command('usersInfo')
-        raw_input('c')
         
 
 

@@ -18,7 +18,7 @@ class ClientConsole(object):
             'quit': self.gestionateQuit,
             'dropdb' : self.gestionateDropBD,
             'dropcol' : self.gestionateDropCOL,
-            'testUser':self.testUser
+            'usersinfo':self.manageUserProfiles
         }
 
 
@@ -40,7 +40,7 @@ class ClientConsole(object):
         print 'Introduce "more" para obtener la lista completa de comandos'
         print 'Introduce "dropdb" para eliminar una base de datos'
         print 'Introduce "dropcol" para eliminar una coleccion'
-        print 'y 0 mas (introduce "more" para ver todos los comandos)'
+        print 'Introduce "usersInfo" para ver los diferentes perfiles asignados'
         print '----------------------------------------------------------\nCONSOLA:\n'
 
 
@@ -92,6 +92,13 @@ class ClientConsole(object):
             mydict[i]=acceptedTypesExample[acceptedTypes.index(mycolFieldsValues[i])]
         x = mycol.insert_one(mydict)
         raw_input('Completado,intro para regresar ')
+    
+    def manageUserProfiles(self):
+        self.refreshScreen()
+        content= self.client.VECT.command('usersInfo')
+        for key in content['users']:
+            print "DB: " + str(key["db"]) + " USER:"+ str(key["user"]) +" ROLES: " +str(key["roles"][-1]["role"])+ '\n'
+        raw_input('Intro para regresar ')
 
     def gestionateInfo(self):
         self.refreshScreen()
