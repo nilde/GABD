@@ -28,7 +28,6 @@ def insertSections(allSections,allClasses,DatabaseName,client,dataVectors):
                 vectorBuffer['vector']=eachVector
                 vectorBufferComplete.append(vectorBuffer)
                 vectorBuffer={}
-        indexContent = fs.put(Binary(pickle.dumps(vectorBufferComplete, protocol=2)))
-        dataSection['content']=indexContent
+        dataSection['content']=vectorBufferComplete
         mycol.insert_one(dataSection)
 

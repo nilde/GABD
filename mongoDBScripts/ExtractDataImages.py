@@ -59,19 +59,18 @@ class ExtractFromImagesFiles:
         for index in range(0,9,3):
             netContent=[]
             with open('prueba'+str(index), "w") as outfile:
-                for entries in finalData:
-                    for length in range(len(self.rawVectorsInformation[index][:])):
-                        outfile.write([self.rawVectorsInformation[index][length][:],self.rawVectorsInformation[index+1][length][:],self.rawVectorsInformation[index+2][length][:]])
-                        outfile.write("\n")
-                netContent.append('')
+                for entries in finalData[:100]:
+                    for length in range(len(self.rawVectorsInformation[index][:100])):
+                        x=([self.rawVectorsInformation[index][length][:],self.rawVectorsInformation[index+1][length][:],self.rawVectorsInformation[index+2][length][:]])
+                        netContent.append(x)
             finalData.append(netContent)
 
         for eachNet in finalData:
             netsWithImageID={}
             print "llego"
             
-            #for i,eachVectors in enumerate(eachNet):
-            #    netsWithImageID[str(i)]=[x for x in eachVectors] #N3
+            for i,eachVectors in enumerate(eachNet):
+                netsWithImageID[str(i)]=[x for x in eachVectors] #N3
             self.vectorsInformationCorretly.append(netsWithImageID)
     def makeExtraction(self):
         self.extractNetsInformation()

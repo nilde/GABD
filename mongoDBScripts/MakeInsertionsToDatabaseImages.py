@@ -53,8 +53,8 @@ class InsertionImagesDatabase:
             imagesComplete['classes']=allClassesInformation
             #FUERA
             #indexVectors = fs.put(Binary(pickle.dumps(allVectorsInformation[i], protocol=2)))
-            #imagesComplete['vectors']=json.dumps(allVectorsInformation[:])
-            #x = mycol.insert_one(imagesComplete)
+            imagesComplete['vectors']=allVectorsInformation
+            x = mycol.insert_one(imagesComplete)
             imagesComplete={}
 
 

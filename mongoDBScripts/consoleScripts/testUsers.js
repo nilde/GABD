@@ -39,3 +39,21 @@ db.createUser(
      ]
    }
 )
+use TEST
+db.auth( 'testR', 'testR' )
+db.TEST.find()
+db.TEST.insertOne( {campo1: "test_3", campo2: 3 } );
+db.createCollection("test_ABLE")
+
+use TEST
+db.auth( 'testRW', 'testRW' )
+db.TEST.find()
+db.TEST.insertOne( {campo1: "test_4", campo2: 4 } );
+db.createCollection("test_ABLE")
+
+use TEST
+db.auth( 'testA', 'testA' )
+db.TEST.find()
+db.TEST.insertOne( {campo1: "test_5", campo2: 5 } );
+db.createCollection("test_ABLE")
+

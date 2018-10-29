@@ -75,8 +75,8 @@ def main():
     allClasses,allData=dataExtractor.makeExtraction()
     allSections,allDataV=ExtractDataNames.main()
 
-    #allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages=dataExtractor_I.makeExtraction()
-    #imagesInsertion.makeImagesInsertions(allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages,client,DatabaseName)
+    allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages=dataExtractor_I.makeExtraction()
+    imagesInsertion.makeImagesInsertions(allNetsDescription,allNetsData,allClassesImages,allDataVectorsImages,client,DatabaseName)
     
     print "FASE 4: Insercion de los datos"
     MakeInsertionsToDatabaseNames.insertSections(allSections,allClasses,DatabaseName,client,allDataV)
