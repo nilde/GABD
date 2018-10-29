@@ -1,0 +1,3 @@
+
+use VECT
+db.getUsers()

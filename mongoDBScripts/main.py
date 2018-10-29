@@ -97,7 +97,7 @@ def main():
     print 'EJECUCION COMPLETA SIN ERRORES :)'
     usersInsertion=InsertionUsers(client)
     clientConsole.start(client)
-    client.drop_database(DatabaseName)
+    #client.drop_database(DatabaseName)
     client.close()
 
 
