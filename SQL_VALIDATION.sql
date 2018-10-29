@@ -1,26 +1,41 @@
 
+--DESCOMENTAR LINEA DE CONNECT PARA CONECTARSE CON EL USUARIO DESEADO
 
---Obtener la lista de usuarios y privilegios
+--CONNECT "AA_DETECTOR_OUTLIERS"/"12"
+--CONNECT "AA_GESTOR_DADES"/"1234"
+--CONNECT "AA_DESENVOLUPADOR"/"123456"
+--CONNECT "AA_AUDITOR"/"12345678"
 
-SELECT * FROM master.sys.server_principals
-SELECT * FROM USER_SYS_PRIVS; 
-SELECT * FROM USER_TAB_PRIVS;
-SELECT * FROM USER_ROLE_PRIVS;
+------------------------------------------------------------------------
 
---Para la validacion de consultas conectaremos con los usuarios creados y comprobaremos nuestros permisos:
+--CREACION DE LA TABLA TEST
+CREATE TABLE "Test"(
+        camp1 varchar2(20),
+        camp2 integer NOT NULL PRIMARY KEY
+        );
 
-SELECT count(*)
-FROM   schema_name.table_name
-where  1=0;
 
-INSERT INTO schema_name.table_name
-SELECT *
-FROM   schema_name.table_name
-WHERE  1=0;
+--INSERCION DE VALORES 
+INSERT INTO "Test"(camp1, camp2) VALUES ('Proba', 1);
 
-DELETE FROM schema_name.table_name
-WHERE  1=0;
+--CONSULTA DE LA TABLA
+SELECT * FROM "Test";
 
-UPDATE schema_name.table_name
-SET    column_name = column_name
-WHERE  1=0;
+--BORAMOS CAMPO1
+ALTER TABLE "Test"
+DROP COLUMN camp1;
+
+--AÑADIMOS NUEVO CAMPO
+ALTER TABLE "Test" 
+ADD camp3 VARCHAR(20) NULL;
+
+--MODIFICAMOS EL TIPO DEL CAMPO AÑADIDO
+ALTER TABLE "Test" 
+MODIFY camp3 varchar2(200);
+
+--CONSULTA DE LA TABLA ACTUALIZADA
+SELECT * FROM "Test";
+
+--BORRAMOS LA TABLA
+DROP TABLE "Test";
+
