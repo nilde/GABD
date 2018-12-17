@@ -1,0 +1,15 @@
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':1}" -N ionosphere
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':1}" -N Iris
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':1}" -N letter-recognition
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':3}" -N ionosphere
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':3}" -N Iris
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':3}" -N letter-recognition
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':6}" -N ionosphere
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':6}" -N Iris
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':6}" -N letter-recognition
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':9}" -N ionosphere
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':9}" -N Iris
+python ./codiOriol/src/testOutlierDetector.py -m DMOD -p"{'k':9}" -N letter-recognition
+python ./codiOriol/src/testOutlierDetector.py -m HOAD -p"{'k':1,'m':1,'sigma':1}" -N ionosphere
+python ./codiOriol/src/testOutlierDetector.py -m HOAD -p"{'k':1,'m':1,'sigma':1}" -N Iris
+python ./codiOriol/src/testOutlierDetector.py -m HOAD -p"{'k':1,'m':1,'sigma':1}" -N letter-recognition
