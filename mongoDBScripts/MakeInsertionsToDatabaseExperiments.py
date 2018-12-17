@@ -36,7 +36,6 @@ class InsertionExperimentsDatabase:
             for i,part in enumerate(eachMethodData):
                 if ']' in part:
                     counter.append(i)
-            print counter
             dataToInsert=[]
             preparedData=eachMethodData[:counter[0]+1]
             preparedData[0]=preparedData[0][1:]
@@ -47,26 +46,21 @@ class InsertionExperimentsDatabase:
 
             preparedData=eachMethodData[counter[0]+2:counter[1]+1]
             preparedData[0]=preparedData[0][1:]
-            preparedData[-1]=preparedData[-1][:-1]
-            openBrackets=[]
-            closeBrackets=[]
+
             finishArray=[]
-            for index,char in preparedData:
-                if char=='{':
-                    openBrackets.append(index)
-                else
-                    if char=='}':
-                        closeBrackets.append(index)
-            
-            dataToInsert.append({'values':','.join(preparedData)})
+            preparedData= ' '.join(preparedData)
+            openBrackets = [x for x, v in enumerate(preparedData) if v == '{']
+            closeBrackets = [x for x, v in enumerate(preparedData) if v == '}']
+
+            for i,x in enumerate(openBrackets):
+                finishArray.append(preparedData[openBrackets[i]+1:closeBrackets[i]])
+            dataToInsert.append({'values':finishArray})
 
             preparedData=eachMethodData[counter[1]+1:]
             preparedData[0]=preparedData[0][1:]
             preparedData[-1]=preparedData[-1][:-1]
 
             dataToInsert.append({'values':preparedData})
-            print dataToInsert
-            raw_input("x")
             methodsComplete.update(dict(zip(methodsDescription,dataToInsert)))
             x = mycol.insert_one(methodsComplete)
             methodsComplete={}
