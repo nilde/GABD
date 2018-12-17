@@ -29,13 +29,12 @@ class InsertionMethodDatabase:
         mydb = client[DatabaseName]
         mycol = mydb[configFile.METHOD_DATABASE]
         methodsComplete={}
-        experiment={'experiments_parameters':{}}
-        experiment['experiments_parameters']={'values':["10,14,13","11,2,3","1,2,3"]}
+        #experiment={'experiments_parameters':{}}
+        #experiment['experiments_parameters']={'values':["10,14,13","11,2,3","1,2,3"]}
         for eachMethodData in methodsData:
             dataToInsert=eachMethodData[:3]
             dataToInsert.append(','.join(eachMethodData[3:]))
             methodsComplete.update(dict(zip(methodsDescription,dataToInsert)))
-            methodsComplete.update(experiment)
             x = mycol.insert_one(methodsComplete)
             methodsComplete={}
 

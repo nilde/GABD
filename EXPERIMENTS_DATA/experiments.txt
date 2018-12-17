@@ -1,0 +1,2 @@
+[iris,ionosphere,letter-recognition],HOAD,[{k=1, m:=1, sigma=1}],[2-0,2-8,5-5,8-2]
+[iris,ionosphere,letter-recognition],DMOD,[{k=1},{k=3},{k=6},{k=9}],[2-0,2-8,5-5,8-2]

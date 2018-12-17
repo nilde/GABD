@@ -1,0 +1,1 @@
+Conjunt_de_dades,metode,parametres,configuracio

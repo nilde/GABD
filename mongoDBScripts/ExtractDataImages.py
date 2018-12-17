@@ -67,7 +67,6 @@ class ExtractFromImagesFiles:
 
         for eachNet in finalData:
             netsWithImageID={}
-            print "llego"
             
             for i,eachVectors in enumerate(eachNet):
                 netsWithImageID[str(i)]=[x for x in eachVectors] #N3

@@ -13,6 +13,7 @@ import MakeInsertionsToDatabaseNames
 import MakeInsertionsToDatabaseData
 from MakeInsertionsUsers import InsertionUsers
 from MakeInsertionsToDatabaseResults import InsertionResultDatabase
+from MakeInsertionsToDatabaseExperiments import InsertionExperimentsDatabase
 from MakeInsertionsToDatabaseMethods import InsertionMethodDatabase
 from MakeInsertionsToDatabaseImages import InsertionImagesDatabase
 from Client import ClientConsole
@@ -41,6 +42,7 @@ parser.add_argument('--drop',nargs=1,help='Si se introduce esta opcion se vaciar
 parser.add_argument('--db',nargs=2,help='Indicar un nombre concreto para la base de datos y no el del archivo de configuracion')
 
 def main():
+    #Entrega 1
     clientConsole=ClientConsole()
     dataExtractor=extractData()
     dataExtractor_N=ExtractFromFile()
@@ -49,6 +51,9 @@ def main():
     imagesInsertion=InsertionImagesDatabase()
     resultsInsertion=InsertionResultDatabase()
     
+    #Entrega 2
+    experimentsInsertion=InsertionExperimentsDatabase()
+    
    
     print 'Parametros: '
     if len(sys.argv)==0:
@@ -56,7 +61,7 @@ def main():
 
     if DropDatabaseConstant in sys.argv:
         DropDatabase=True
-        print '--drop : Cuidado, has escogido la opcion drop espero que sepas lo que estas haciendo ...'
+        print '--drop : Cuidado, has escogido la opcion drop'
 
     if DatabaseNameConstant in sys.argv:
         DatabaseName=sys.argv[-1]
@@ -67,8 +72,6 @@ def main():
     if not serverStatus:
         return -1
 
-
-    
     print "FASE 2: Extraccion de las fases "
 
     print "FASE 3: Extraccion de los datos "
@@ -86,6 +89,7 @@ def main():
     methodInsertion.makeMethodsInsertions(description,data,client,DatabaseName)
     del description[:]
     del data[:]
+    
 
     print "FASE 6: Insercion de los resultados"
     description,data=dataExtractor_N.makeExtraction(configFile.RESULT_PATH,configFile.RESULT_FILENAME_NAMES,configFile.RESULT_FILENAME_DATA) 
@@ -93,15 +97,17 @@ def main():
     del description[:]
     del data[:]
 
+    print "FASE 7: Insercion de los experimentos"
+    description,data=dataExtractor_N.makeExtraction(configFile.EXPERIMENTS_PATH,configFile.EXPERIMENTS_FILENAME_NAMES,configFile.EXPERIMENTS_FILENAME_DATA) 
+    experimentsInsertion.makeExperimentsInsertions(description,data,client,DatabaseName) 
+    del description[:] 
+    del data[:]
+
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'
-    usersInsertion=InsertionUsers(client)
     clientConsole.start(client)
-    #client.drop_database(DatabaseName)
     client.close()
 
-
-    
 
 if __name__=="__main__":
     main()
