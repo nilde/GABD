@@ -96,12 +96,10 @@ def main():
     resultsInsertion.makeResultsInsertions(description,data,client,DatabaseName)
     del description[:]
     del data[:]
-
-    print "FASE 7: Insercion de los experimentos"
-    description,data=dataExtractor_N.makeExtraction(configFile.EXPERIMENTS_PATH,configFile.EXPERIMENTS_FILENAME_NAMES,configFile.EXPERIMENTS_FILENAME_DATA) 
-    experimentsInsertion.makeExperimentsInsertions(description,data,client,DatabaseName) 
-    del description[:] 
-    del data[:]
+    #EJECUCION DE LOS EXPERIMENTOS
+    with open("../CONFIG_EXPERIMENTS_DATA/experiments.txt") as f: 
+        for line in f:
+            os.system(line)
 
 
     print 'EJECUCION COMPLETA SIN ERRORES :)'

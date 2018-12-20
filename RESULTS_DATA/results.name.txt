@@ -1,1 +1,1 @@
-AUC,Precision,Recall,Date,Database,IDConfiguration
+AUC,tpr,fpr,Date,Database,IDConfiguration

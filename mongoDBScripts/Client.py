@@ -18,7 +18,9 @@ class ClientConsole(object):
             'quit': self.gestionateQuit,
             'dropdb' : self.gestionateDropBD,
             'dropcol' : self.gestionateDropCOL,
-            'usersinfo':self.manageUserProfiles
+            'usersinfo':self.manageUserProfiles,
+            'outliers':self.getOutliers,
+            'vectors':self.getVectors
         }
 
 
@@ -40,11 +42,28 @@ class ClientConsole(object):
         print 'Introduce "more" para obtener la lista completa de comandos'
         print 'Introduce "dropdb" para eliminar una base de datos'
         print 'Introduce "dropcol" para eliminar una coleccion'
+        print 'Introduce "outliers" para ver los outliers de ese dataset.'
+        print 'Introduce "vectors" para ver los vectores de ese dataset.'
         print 'Introduce "usersInfo" para ver los diferentes perfiles asignados'
         print '----------------------------------------------------------\nCONSOLA:\n'
 
 
-    
+    def getOutliers(self):
+        dataset=raw_input("Introduce el dataset que quieres consultar sus outliers")
+        mycolOutliers = self.client.VECT['OUTLIERS']
+        outliersFound=mycolOutliers.find({"datasetName":dataset})
+        for i in outliersFound:
+            print str(i) + '\n'
+        raw_input("Pulsa cualquier tecla para volver")
+
+    def getVectors(self):
+        dataset=raw_input("Introduce el dataset que quieres consultar sus vectores")
+        mycolVectors = self.client.VECT['DATABASES_INFO']
+        vectorsFound=mycolVectors.find({"name":dataset})
+        for i in vectorsFound:
+            print str(i)+ '\n'
+        raw_input("Pulsa cualquier tecla para volver")
+
 
     def refreshScreen(self):
 

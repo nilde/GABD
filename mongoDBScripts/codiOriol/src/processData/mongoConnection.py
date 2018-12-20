@@ -12,6 +12,7 @@ from collections import namedtuple
 from sshtunnel import SSHTunnelForwarder
 from pymongo import MongoClient
 import struct
+import pymongo
 
 import noConnection as nc
 
@@ -92,230 +93,6 @@ class mongoConnexion(nc.noConnexion):
     self._noConnexion__conn.close()
     if hasattr(self,'server'): self.server.stop()
 
-  def exists(self, dataset):
-      """
-
-      :param dataset: name of the dataset
-      :return: True if all the feature vectors of the dataset are already inserted in the DB
-      """
-      # TODO:
-      # + Feu la consulta que us permeti determinar si ja heu inserit abans les dades o no. Podeu utilitzar el codi
-      # d'exemple que hi ha a continuació
-
-      """
-      Poseu el nom de la col·lecció on guardeu la informació dels datasets
-      """
-      collectionName="Datasets"
-
-      collection = self.bd[collectionName]
-
-      """
-      filtre per a la query
-      """
-
-      filter_query = {
-        "name": dataset
-      }
-
-      res = collection.find(filter_query)
-
-      # TODO
-      # Comprovar si hi ha cap resultat
-      return res.count() > 0
-
-
-  def insertVectorDataset(self, nameDataset, fileName, params ):
-    """
-        Inserts the contents stored in fileName into de DB
-
-        Params:
-        :param nameDataset: name of the dataset to be inserted into the database.
-        :param fileName: full path of the file where the data to be imported is stored.
-        :param params: dataset params, read from the config file.
-        :return: None
-    """
-
-    #
-    datasetParams = params['datasets'][nameDataset.lower()]
-    if "label_pos" in datasetParams:
-      label_pos = int(datasetParams['label_pos'])
-    else:
-      label_pos = -1
-
-
-
-    # insert dataset
-    """
-    Comprovem si el nombre de classes del dataset està en params o no
-    """
-    if "k" in params:
-        #TODO: Haureu de guardar aquesta informació a la BD
-        print("k: {}".format(params["k"]))
-        k=params["k"]
-    else:
-        #TODO: Haureu de guardar la informació de la BD sense la inforamció de la K (numero de classes)
-        print("Haureu de guardar la informació de la BD sense la inforamció de la K (numero de classes)")
-
-
-
-    """
-    Anem a llegir el contingut dels fitxers i els guardem en una estructura definida per fila amb camps: id, label, feature
-    """
-    fila = namedtuple("fila", "id label features ")
-    f = open(fileName)
-    line = f.readline().rstrip("\n").rstrip("\r")
-
-    features = []
-    id = 0
-    labels = []
-    while line:
-      stringFeatures = line.split(",")
-      label = stringFeatures[label_pos]
-      stringFeatures.remove(label)
-      label = label.rstrip('\n')
-      feature = [float(x) for x in stringFeatures]
-      if len(feature) > 0:
-        features.append(fila(id=id, label=label, features=feature))
-        id = id + 1
-
-      line = f.readline().rstrip("\n").rstrip("\r")
-    f.close()
-
-    """
-    Caldra guardar la informació a la BD segons l'estructura que hagueu decidit
-    """
-    collection = self.bd["Mostres"]
-    for row in features:
-        #TODO: insereu les dades
-        collection.update({"Dataset":nameDataset, "id":row.id},{"Dataset":nameDataset, "id":row.id,"features":row.features, "label":row.label}, upsert=True)
-
-    self.bd["Datasets"].insert_one({"name":nameDataset,"total":id,"type":"vector"})
-
-
-  def insertImageDataset(self, dataset, fileName, params, labels='anno', imageExt='.jpg', labelsExt='.txt'):
-    """
-      This method imports the information related to image datasets. It has to insert all the data before to commit changes.
-
-      :param dataset: name of the dataset to be imported into the DBMS .
-      :param fileName: full path of the file where the feature vectors are stored.
-      :param params: params read from the config file (if required).
-      :param labels: name of the folder where label files are found.
-      :param imageExt: images extension
-      :param labelsExt: file labels extension
-      :return: True if the image dataset is succesfully imported into the DB.
-    """
-
-    dataDir = "/".join(os.path.dirname(fileName).split("/")[0:-1])
-    dirImages = dataDir + "/images"
-
-    """
-    El següent bucle recorre la carpeta de imatges i extreu la id de la imatge a partir del nom
-    """
-    collection = self.bd["Mostres"]
-    listImages = glob.glob(dirImages + '/*' + imageExt)
-    for imageName in listImages:
-        nom, _ = os.path.splitext(os.path.basename(imageName))
-        match = re.search(r'im(?P<id>\d+)', nom)
-
-        data = {'name': nom, 'image_id': int(match.group('id'))}
-
-        # TODO: caldra inserir la informació en la BD
-        collection.update({"Dataset": dataset, "id": data["image_id"]},
-                      {"Dataset": dataset, "id": data["image_id"], "name": data["name"]}, upsert=True)
-
-    self.bd["Datasets"].insert_one({"name": dataset, "total": len(listImages)})
-    # load image annotation
-    wd = dataDir + '/' + labels + '/'
-    fileLabels = glob.glob(wd + '*' + labelsExt)
-
-    """
-    El següent codi recorre la carpeta amb els fitxers d'anotacions i recupera la informació de les etiquetes
-    """
-
-    for fileLabel in fileLabels:
-        nom, _ = os.path.splitext(os.path.basename(fileLabel))
-        if nom[-3:] != '_r1' and nom != "README":
-            f = open(fileLabel)
-            line = f.readline().rstrip("\n").rstrip("\r")
-            while line:
-                if len(line) > 0:
-                    data = {'label': nom, 'image_id': int(line)}
-
-                    # TODO: caldrà inserir les dades a la BD
-                    res = collection.find({"Dataset": dataset, "id": data["image_id"]})
-                    if res.count() > 0:
-                      for row in res:
-                        if "label" in row:
-                          label = row["label"] + [nom]
-                        else:
-                          label = [nom]
-                        collection.update({"Dataset": dataset, "id": row["id"]},{"Dataset": dataset, "id": row["id"], "name": row["name"], "label": label}, upsert=True)
-                    #else:
-                    #  label = [nom]
-
-                    line = f.readline().rstrip("\n").rstrip("\r")
-
-            f.close()
-
-    #self.commit()
-
-    print ("Inserted info image dataset {!r}".format(dataset))
-    return True
-
-
-  def insertDescriptors(self, dataset, featuresName, fileName, params, featuresDir='features'):
-      """
-
-      :param dataset:
-      :param features:
-      :param fileName:
-      :param params:
-      :param featuresDir:
-      :return:
-      """
-
-      """
-      El següent codi llegeix els fitxers de caracteristiques i els processa. 
-      """
-
-      dataDir = "/".join(os.path.dirname(fileName).split("/")[0:-1])
-      dirImages = dataDir + "/" + featuresDir
-
-
-      featureSchema, fileExt = os.path.splitext(fileName)
-      if fileExt[-8:].lower() != 'features':
-          print ("Warning {} not seems to be a feature file".format(fileName))
-      layer = fileExt[1:-8]
-
-      # load feature vector
-      f = open(fileName, 'r')
-      dims = [int(val) for val in f.readline().rstrip("\n").split(" ")]
-      x = f.read()
-      f.close()
-      size = int(params['feat_size'])  # bytes to represent each float
-      type = params['type']
-
-      collection = self.bd["Mostres"]
-      for i in range(0, dims[0]):
-          # cur.execute(None, {'image_id': i, 'layer': layer, 'features': Features[i] })
-          bf = x[i * dims[1] * size:(i + 1) * size * dims[1]]
-          numFeatures = len(bf) / size
-          features = list(struct.unpack(type * numFeatures, bf))
-
-          res = collection.find({"Dataset": dataset.lower(), "id": i + 1,"cnn": { "$exists" : "true"}})
-          if res.count() > 0:
-              record = collection.find({"Dataset": dataset.lower(), "id": i + 1,
-                                        "cnn": {"$elemMatch": {"name": featuresName, "layer": layer}}})
-              if record.count() == 0:
-                  collection.update({"Dataset": dataset.lower(), "id": i + 1},
-                            {"$push" : {"cnn":  {"name": featuresName, "layer": layer, "features": features } } } )
-          else:
-              collection.update({"Dataset": dataset.lower(), "id": i + 1},
-                              {"$set": { "cnn": [ {"name": featuresName, "layer": layer, "features": features } ] }})
-
-
-      print ("""{} features of scheme {} correctly inserted """.format(layer, featureSchema))
-
   def insertExperiment(self, conf, repeticio,  method, paramsMethod):
     '''
     Inserim en la taula Experiment la informació bàsica de l'experiment, si no existeix. Si existeix retorna el OID del document
@@ -327,21 +104,20 @@ class mongoConnexion(nc.noConnexion):
 
 
     '''
-
+    client = pymongo.MongoClient("localhost",27017,serverSelectionTimeoutMS=1000)
 
     """inserim la informació dels experiments"""
-    collection = self.bd["Experiments"]
-
-    #TODO: SESSIO 15 Busca a la col·leccio si el document hi és.
-    res = []
-
-    if False: #res.count() > 0:
+    mydb = client['VECT']
+    mycolExperiments = mydb['EXPERIMENTS']
+    res = mycolExperiments.find({"conf":str(conf),"repeticio":str(repeticio),"method":str(method),"paramsMethod":str(paramsMethod)})
+    if len(res)>0:
       idEM = res[0]["_id"]
     else:
-      #TODO: SESSIO 15 Si no hi és, insereu-lo
+      
       res = []
-      idEM = res
+      mycolExperiments.insert({"conf":str(conf),"repeticio":str(repeticio),"method":str(method),"paramsMethod":str(paramsMethod)})
 
+    client.close()
     return idEM
 
 
@@ -358,7 +134,7 @@ class mongoConnexion(nc.noConnexion):
     :return:
     """
 
-
+    print  newFeatures, nameDataset, repeticio, outliersGTIdx, conf ,
     numViews = len(newFeatures)
 
     collection = self.bd["Outliers"]
@@ -366,8 +142,6 @@ class mongoConnexion(nc.noConnexion):
     for i in outliersGTIdx:
       # Hem de construir el vector de caracteristiques complet
       features = np.hstack([newFeatures[y][i].features for y in range(numViews)]).tolist()
-
-
 
 
       if dataInfo["type"] == "vector":
@@ -456,10 +230,10 @@ class mongoConnexion(nc.noConnexion):
     :return:
     '''
 
+    client = pymongo.MongoClient("localhost",27017,serverSelectionTimeoutMS=1000)
+    collection = client["DATABASES_INFO"]
 
-    collection = self.bd["Mostres"]
-
-    res = collection.find({"Dataset": nameDataset},{"id":1,"features":1,"label":1})
+    res = collection.find({"name": nameDataset})
 
 
     fila = namedtuple("fila", "id features")
@@ -506,9 +280,12 @@ class mongoConnexion(nc.noConnexion):
     return taula, ids
 
   def loadData(self,nameDataset, data):
-
+    print "LLEGO"
+    self.__loadVectorData(nameDataset, data)
     if nameDataset.lower() == "synthetic data":
         features, classIds = u.generateSyntheticData()
+        print "entro"
+        
     else:
         if data.type == "vector":
             features, classIds = self.__loadVectorData(nameDataset, data)

@@ -26,8 +26,9 @@ __email__ = 'oriolrt@cvc.uab.cat'
 
 
 
-
-
+#PROPIO
+from collections import namedtuple
+import pymongo
 import ast
 import getopt
 import glob
@@ -42,7 +43,7 @@ from pprint import pprint
 
 from scipy.spatial import distance as dist
 from sklearn import metrics
-
+ 
 from OutlierDetector.CMOD import CMOD
 from OutlierDetector.DMOD import DMOD
 from OutlierDetector.HOAD import HOAD
@@ -187,6 +188,10 @@ if __name__ == '__main__':
         numRepeticions = 2
         confList = [(2,0),(2,8),(5,5),(8,2)]
 
+
+    #PROPIO
+    client = pymongo.MongoClient("localhost",27017,serverSelectionTimeoutMS=1000)
+
     for conf in confList:
         """Inicialitzem"""
         if method.upper() == "DMOD":
@@ -206,10 +211,31 @@ if __name__ == '__main__':
             """.format(i))
 
             newFeatures, y, outliersGTIdx = od.prepareExperimentData(db, conf,  datasetName, dataInfo, i, settings={'numViews':numViews})
+            
+            #PROPIO
+            mydb = client['VECT']
+            mycolExperiments = mydb['EXPERIMENTS']
 
-            idExperiment = db.insertExperiment(conf, i, method, paramsMethod)
+            res = mycolExperiments.find({"conf":str(conf),"repeticio":str(i),"method":str(method),"paramsMethod":str(paramsMethod)})
+            if res.count()>0:
+                idEM = res[0]["_id"]
+            else:
+                res = []
+                mycolExperiments.insert({"conf":str(conf),"repeticio":str(i),"method":str(method),"paramsMethod":str(paramsMethod)})
 
             outliersIdx = od.detector(newFeatures, paramsMethod )
+
+            mycolOutliers = mydb['OUTLIERS']
+            maxV= mycolOutliers.count()
+            maxV=maxV+1
+            #RESULTS INSERTION
+            res = mycolOutliers.find({"newFeatures":str(newFeatures),"datasetName":str(datasetName),"repeticio":str(i),"outliersIdx":str(outliersIdx),"conf":str(conf),"dataInfo":str(dataInfo)})
+            if res.count()>0:
+                idEM = res[0]["_id"]
+            else:
+                res = []
+            x = mycolOutliers.insert_one({"newFeatures":str(newFeatures),"datasetName":str(datasetName),"repeticio":str(i),"outliersIdx":str(outliersIdx),"conf":str(conf),"dataInfo":str(dataInfo)})
+            #db.insertOutlierData(newFeatures, datasetName, i, outliersIdx, conf , dataInfo )
 
             """Calculem les mètriques d'avaluació"""
             # Evaluate Outliers
@@ -217,17 +243,44 @@ if __name__ == '__main__':
             auc = metrics.auc(tpr, fpr)
 
             """Inserim els resultats a la BD """
-            db.insertResults(datasetName, idExperiment, fpr, tpr, auc, dataInfo)
+            
+            #DIFF COLLEECTIONS
+            mycolResults = mydb['RESULTS']
+            mycolExperiments = mydb['EXPERIMENTS']
+            maxV= mycolResults.count()
+            maxV=maxV+1
+            #RESULTS INSERTION
+            res = mycolExperiments.find({"conf":str(conf),"repeticio":str(i),"method":str(method),"paramsMethod":str(paramsMethod)})
+            if res.count()>0:
+                idEM = res[0]["_id"]
+            else:
+                res = []
+            dataToInsert={'AUC':str(auc),'tpr':str(tpr),'fpr':str(fpr),'Database':str(datasetName),'IDConfiguration':str(dataInfo),'idExperiment':str(maxV)}
+            x = mycolResults.insert_one(dataToInsert)
+            #db.insertResults(datasetName, idExperiment, fpr, tpr, auc, dataInfo)
+            collection = mydb["DATABASES_INFO"]
+
+            res = collection.find({"name": datasetName})
+
+            fila = namedtuple("fila", "id features")
+
+            res=res[0]["content"]
+            taula = []
+            ids = {}
+            for id,row in enumerate(res):
+                taula.append(fila(id=id, features=row["vector"].split(',') ))
+                if row["class"] in ids.keys():
+                    ids[row["class"]] = ids[row["class"]] + [id]
+                else:
+                    [row["class"]] = [id]
+            print taula
 
             """Mostrem els resultats per consola"""
-            print method
             valorsStr = "{}: {}".format(dataInfo, method)
             for key in paramsMethod:
                 valorsStr = valorsStr + ", {}={}".format(key, paramsMethod[key])
             valorsStr = valorsStr + ", {}-{} (repeticio {}): %.3f".format(conf[0],conf[1],i) %(auc)
-
-            print(valorsStr)
-
+    client.close()
     db.close()
     print("Experiments fets")
     sys.exit(0)
