@@ -1,0 +1,298 @@
+CREATE OR REPLACE package gabd as 
+/*
+    paquet de funcions i procediments a implementar pel projecte de Gestió i Administració de Bases de Dades de la menció d'enginyeria del software
+    
+    autor: Oriol Ramos Terrades (oriol.ramos@uab.cat)
+    copyright: Universitat Autònoma de Barcelona, 2018.
+
+*/
+
+   TYPE t_var is table of varchar2(20)  index by pls_integer;
+   TYPE num_array is table of number index by PLS_integer;
+   
+   procedure parseConf(conf in varchar2, class_outlier_ratio out number, attr_outlier_ratio out number); 
+    
+    /* 
+        Funcions i procediments a implementar 
+    */  
+    procedure insertVectorOutliers( name in varchar2, cf in varchar2 , repeticio in number , outliersId in number , outliersVector in blob );
+    /*
+    name in varchar2        : nom del data set.
+    cf in varchar2          : configuració de l?experiment.
+    repeticio in number     : repetició de l?experiment. 
+    outliersIds in number   : id del vector de característiques que s?ha canviat a outlier.
+    outliersVectors in blob : vector de característiques del outlier.
+    */
+   
+    function insertExperiment( conf in varchar2, class_outlier in number, attr_outlier in number, repeticio in number, ODname in varchar2, ParamCode in number,  claus in t_var, valors in num_array ) return number;
+    /*
+    conf in varchar2        : configuració de l?experiment.
+    class_outlier in number : percentatge d?ouliers tipus class. 
+    attr_outlier in number  : percentatge d?outliers tipus atribut.
+    repeticio in number     : repetició de l?experiment.
+    ODname in varchar2      : nom del mètode de detecció d?outliers
+    ParamCode in number     : codi que identifica el mètode, els paràmetres del mètode i els seus valors. Pot ser necessari per identificar els experiments i evitar files repetides.
+    claus in t_var          : llistat amb els noms (varchar) dels paràmetres del mètode de detecció de outliers.
+    valors in num_array     : llistat amb els valors (number) dels paràmetres. Té la mateixa longitud que claus.
+    
+    return number           : retorna el identificador de l?experiment que ha de ser numèric.
+    */
+    
+    procedure insertResultats( name in varchar2, idExperiment in number , typeDataset in varchar  , auc  in number , fpr in blob, tpr in blob );
+    /*
+    name in varchar2		: nom del data set. 
+    idExperiment in number  : identificador de l?experiment.
+    typeDataset in varchar  : tipus de data set (imatges o UCI).
+    auc  in number          : AUC (area sota la corva) resultat. 
+    fpr in blob             : resultat dels False positive rate.
+    tpr in blob             : resultats dels True positive rate.
+    */
+    
+    function loadVectorData( Dataset in varchar2  ) return SYS_REFCURSOR;
+    /*
+    Dataset in varchar2     : nom del data set.
+
+    return SYS_REFCURSOR    : retorna tots els vectors de característiques del data set. Ho retorna utilitzant un tipus cursor.
+    */
+    
+    function loadVectorOutliers( name in varchar2, cf in varchar2 , repeticion in number ) return SYS_REFCURSOR;
+    /*
+    name in varchar2		: nom del data set.
+    cf in varchar2 			: configuració de l?experiment.
+    repeticion in number 	: repetició de l?experiment.
+    return SYS_REFCURSOR    : retorna tots els vectors de característiques dels outliers, donat un experiments i data set. Ho retorna utilitzant un tipus cursor.
+    */
+    
+    /* Les següents funcions són opcionals a implementar */
+    procedure insertImageOutliers( name in varchar2, cf in varchar2 , repeticio in number , cnn in varchar, layers in varchar , outliersIds in number, outliersVectors in blob  );
+    function loadImageOutliers( name in varchar2, cf in varchar2 , repeticion in number , cnn in varchar, layers in varchar ) return SYS_REFCURSOR;
+    
+end gabd;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY GABD AS
+
+  procedure parseConf(conf in varchar2, class_outlier_ratio out number, attr_outlier_ratio out number) AS
+  BEGIN
+    -- TODO: Implementation required for procedure GABD.parseConf
+   select regexp_substr(conf, '[0-9,.]+',1,1)/100.0 into class_outlier_ratio
+   from dual;
+   
+   select regexp_substr(conf, '[0-9,.]+',1,2)/100.0 into attr_outlier_ratio
+   from dual;
+   
+    
+  END parseConf;
+
+  /* 
+        Funcions i procediments a implementar 
+  */ 
+
+
+  procedure insertVectorOutliers( name in varchar2, cf in varchar2 , repeticio in number , outliersId in number , outliersVector in blob ) 
+  /*
+    name in varchar2        : nom del data set.
+    cf in varchar2          : configuració de l?experiment: 2-0, 2-8, 5-5, 8-2
+    repeticio in number     : repetició de l?experiment. 
+    outliersIds in number   : id del vector de característiques que s?ha canviat a outlier.
+    outliersVectors in blob : vector de característiques del outlier.
+  */
+  AS
+  class_outlier_ratio number;
+  attr_outlier_ratio number;
+  idRepeticio number;
+  BEGIN
+  
+    --Obtenim els percentatges d'outlier segons la configuracio
+    parseConf(cf,class_outlier_ratio,attr_outlier_ratio);
+  
+    /*
+    TODO: Implementeu el codi necessari per inserir els outliers a la BD. Penseu que un outlier està identificat pels camps: 
+        - name
+        - cf
+        - repeticio
+        - outliersID
+    */
+
+  END insertVectorOutliers;
+
+   
+  FUNCTION insertExperiment( conf in varchar2, class_outlier in number, attr_outlier in number, repeticio in number, ODname in varchar2, ParamCode in number,  claus in t_var, valors in num_array ) return number
+  /*
+    conf in varchar2        : configuració de l?experiment.
+    class_outlier in number : percentatge d?ouliers tipus class. 
+    attr_outlier in number  : percentatge d?outliers tipus atribut.
+    repeticio in number     : repetició de l?experiment.
+    ODname in varchar2      : nom del mètode de detecció d?outliers
+    ParamCode in number     : codi que identifica el mètode, els paràmetres del mètode i els seus valors. Pot ser necessari per identificar els experiments i evitar files repetides.
+    claus in t_var          : llistat amb els noms (varchar) dels paràmetres del mètode de detecció de outliers.
+    valors in num_array     : llistat amb els valors (number) dels paràmetres. Té la mateixa longitud que claus.
+    
+    return number           : retorna el identificador de l?experiment que ha de ser numèric.
+  */
+  AS
+    class_outlier_ratio number;
+    attr_outlier_ratio number;
+    idExperiment number := -1;
+  begin
+    
+    /*TODO
+        Heu d'inserir la informació dels experiments en les taules que hagueu creat. 
+        
+        Sortida: 
+            idExperiment: sencer que identifica els experiments. Serà el valor que es passi al mètode insertResults
+        
+    */
+    
+    --Obtenim els percentatges d'outlier segons la configuracio
+    parseConf(conf,class_outlier_ratio,attr_outlier_ratio);
+        
+    return idExperiment;
+            
+
+
+  END insertExperiment;
+  
+  procedure insertResultats( name in varchar2, idExperiment in number , typeDataset in varchar  , auc  in number , fpr in blob, tpr in blob ) 
+  /*
+    name in varchar2		: nom del data set. 
+    idExperiment in number  : identificador de l?experiment.
+    typeDataset in varchar  : tipus de data set (imatges o UCI).
+    auc  in number          : AUC (area sota la corva) resultat. 
+    fpr in blob             : resultat dels False positive rate.
+    tpr in blob             : resultats dels True positive rate.
+  */
+  AS
+  BEGIN
+    -- TODO: Implementation required for procedure GABD.insertResults
+    
+    if idExperiment = -1
+    then
+        DBMS_OUTPUT.put_line('S''ha d''implementar la funció');
+    
+    end if;
+    
+    commit;
+  END insertResultats;
+
+
+
+  function loadVectorData( Dataset in varchar2 ) return SYS_REFCURSOR 
+  /*
+    Dataset in varchar2     : nom del data set.
+
+    return SYS_REFCURSOR    : retorna tots els vectors de característiques del data set. Ho retorna utilitzant un tipus cursor.
+  */
+  AS
+    my_cursor SYS_REFCURSOR;
+     BEGIN
+    
+                
+    OPEN my_cursor FOR SELECT 0,0,to_blob('00000000000000000000000000000000') 
+                        FROM dual
+                        union all
+                        (SELECT 1,1,to_blob('00000000000000000000000000000000') 
+                        FROM dual)
+                        order by 1,2;
+  
+    RETURN my_cursor;
+  END loadVectorData;
+  
+
+
+  function loadVectorOutliers( name in varchar2, cf in varchar2 , repeticion in number ) return SYS_REFCURSOR 
+  /*
+    name in varchar2		: nom del data set.
+    cf in varchar2 			: configuració de l?experiment.
+    repeticion in number 	: repetició de l?experiment.
+    return SYS_REFCURSOR    : retorna tots els vectors de característiques dels outliers, donat un experiments i data set. Ho retorna utilitzant un tipus cursor.
+  */
+  AS my_cursor SYS_REFCURSOR;
+  BEGIN
+  
+    /*Posem un bloqueig compartit per evitar inconsistencies en la BD
+    
+    Hem posat el següent bloqueig:
+    */
+    --Descomenteu la linia i poseu el nom de la vostra taula
+    --LOCK TABLE A   IN share row exclusive  MODE;
+    /*
+    SHARE ROW EXCLUSIVE is used to look at a whole table and to allow others to look at rows in the table but to prohibit 
+    others from locking the table in SHARE mode or from updating rows.
+    
+    Però podeu posar d'altres si ho estimeu més: https://docs.oracle.com/cd/B28359_01/server.111/b28286/statements_9015.htm#SQLRF01605
+    */
+
+
+    /*
+    TODO: feu una consulta que retorni el id del vector i les caracteristiques i retorni el resultat en el cursor "my_cursor"
+    definit a l'inici de la funció.
+    
+    Per exemple. Si teniu les dades en la taula A. La instruccio que haurieu de fer és:
+    
+    OPEN my_cursor FOR select A.id,A.features
+    from A 
+    where A.namedataset=nameDataset and A.numero=repeticion and A.conf=conf;
+    */
+    
+    OPEN my_cursor FOR select 0,to_blob('00000000000000000000000000000000')
+                        from dual;
+    
+    return my_cursor;
+    
+  END loadVectorOutliers;
+  
+  
+  /* Les següents funcions són opcionals a implementar */
+  function loadImageOutliers( name in varchar2, cf in varchar2 , repeticion in number , cnn in varchar, layers in varchar ) return SYS_REFCURSOR 
+  AS my_cursor SYS_REFCURSOR;
+  BEGIN
+  
+    /*Posem un bloqueig compartit per evitar inconsistencies en la BD
+    
+    Hem posat el següent bloqueig:
+    */
+    --Descomenteu la linia i poseu el nom de la vostra taula
+    --LOCK TABLE A   IN share row exclusive  MODE;
+    /*
+    SHARE ROW EXCLUSIVE is used to look at a whole table and to allow others to look at rows in the table but to prohibit 
+    others from locking the table in SHARE mode or from updating rows.
+    
+    Però podeu posar d'altres si ho estimeu més: https://docs.oracle.com/cd/B28359_01/server.111/b28286/statements_9015.htm#SQLRF01605
+    */
+    
+
+    /*
+    TODO: feu una consulta que retorni el id del vector i les caracteristiques i retorni el resultat en el cursor "my_cursor"
+    definit a l'inici de la funció.
+    
+    Per exemple. Si teniu les dades en la taula A. La instruccio que haurieu de fer és:
+    
+    OPEN my_cursor FOR select A.id,A.features
+    from A 
+    where A.namedataset=nameDataset and A.numero=repeticion and A.conf=conf;
+    */
+    
+    OPEN my_cursor FOR select 0,to_blob('00000000000000000000000000000000')
+    from dual;
+    
+    return my_cursor;
+
+  END loadImageOutliers;
+
+ 
+
+
+  procedure insertImageOutliers( name in varchar2, cf in varchar2 , repeticio in number , cnn in varchar, layers in varchar , outliersIds in number, outliersVectors in blob  ) AS
+  BEGIN
+    -- TODO: Implementation required for procedure GABD.insertImageOutliers
+    NULL;
+  END insertImageOutliers;
+
+
+
+
+
+END GABD;
+/

@@ -1,0 +1,1 @@
+Tots els scripts i documents de mongo estan al gitHub
